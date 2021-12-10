@@ -29,7 +29,7 @@ const post = [
     },
     {
         author: 'Angela Caroll',
-        profilePic: getRndInteger(1, 100),
+        profilePic: '',
         date: moment('20.11.2021 09:19', moment.defaultFormat).fromNow(),
         text: 'Placeat libero ipsa nobis ipsum quibusdam quas harum ut. Distinctio minima iusto. Ad ad maiores et sint voluptate recusandae architecto. Et nihil ullam aut alias.',
         image: getRndInteger(1, 100),
@@ -56,75 +56,56 @@ const post = [
 
 
 let containerPosts = document.getElementById('container');
-containerPosts.innerHTML = '';
 
 for (let index = 0; index < post.length; index++) {
-    let element = post[index];
 
-    let templatePost = `
-        <div class="post">
-            <div class="post__header">
-                <div class="post-meta">
-                    <div class="post-meta__icon">
-                        <img class="profile-pic" src="https://unsplash.it/300/300?image=${element.profilePic}" alt="${element.author}">
-                    </div>
-                    <div class="post-meta__data">
-                        <div class="post-meta__author">${element.author}</div>
-                        <div class="post-meta__time">${element.date}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="post__text">${element.text}</div>
-            <div class="post__image">
-                <img src="https://unsplash.it/600/300?image=${element.image}" alt="">
-            </div>
-            <div class="post__footer">
-                <div class="likes js-likes">
-                    <div class="likes__cta">
-                        <a class="like-button  js-like-button" href="#" data-postid="1">
-                            <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
-                            <span class="like-button__label">Mi Piace</span>
-                        </a>
-                    </div>
-                    <div class="likes__counter">
-                        Piace a <b id="like-counter-1" class="js-likes-counter">${element.likes}</b> persone
-                    </div>
-                </div>
-            </div>
-        </div>
-        `;
-    
-    containerPosts.innerHTML += templatePost;
+    containerPosts.innerHTML += makePost(post[index]);
 
-    let likeButton = document.querySelector('.like-button');
-    console.log(likeButton);
+}
+
+let postFooter = document.querySelectorAll('.post__footer');
+
+for (let x = 0; x < postFooter.length; x++) {
+    const like = postFooter[x];
+    const likeButton = like.querySelector('.like-button');
+    const containerLike = like.querySelector('#like-counter-1');
+    let numberLike = containerLike.innerText;
+
+    let liked = false;
     likeButton.addEventListener('click', function () {
-        likeButton.classList.add('like-button--liked');
-        let containerLike = (document.getElementById('like-counter-1'));
-        let numberLike = parseInt(containerLike.innerText);
-        numberLike = numberLike + 1;
-        containerLike.innerHTML = numberLike;
-        console.log(numberLike);
-    })
-
+        if (liked == false){
+            this.classList.add('like-button--liked');
+            numberLike++;
+            liked = true;
+        } else {
+            this.classList.remove('like-button--liked');
+            numberLike--;
+            liked = false;
+        }
+        containerLike.innerText = numberLike;
+    });
 }
 
 
 
 //funzione per creare i post
-function makePost (array, container) {
-    container.innerHTML = '';
+function makePost(element) {
     
-    let element = '';
-    for (let index = 0; index < array.length; index++) {
-        element = array[index];
+    let profilePicture = `<img class="profile-pic" src="https://unsplash.it/300/300?image=${element.profilePic}" alt="${element.author}">`;
 
-        const templatePost = `
+    //se l'immagine del profilo non c'è
+    if (element.profilePic == ''){
+        const initials = getUserInitials(element.author);
+        profilePicture = `<div class="profile-pic-default"><span>${initials}</span></div>`;
+    }
+
+    //template per il post
+    const templatePost = `
         <div class="post">
             <div class="post__header">
                 <div class="post-meta">
                     <div class="post-meta__icon">
-                        <img class="profile-pic" src="https://unsplash.it/300/300?image=${element.profilePic}" alt="${element.author}">
+                        ${profilePicture}
                     </div>
                     <div class="post-meta__data">
                         <div class="post-meta__author">${element.author}</div>
@@ -151,14 +132,15 @@ function makePost (array, container) {
             </div>
         </div>
         `;
-        container.innerHTML += templatePost;
-        console.log(element.likes);
-    }
-    
+    return templatePost;
 }
 
-
-
+//funzioni per le iniziali dell'utente
+function getUserInitials(author) {
+    const fullName = author.split(' ');
+    const initials = fullName.shift().charAt(0) + fullName.pop().charAt(0);
+    return initials.toUpperCase();
+}
 
 //funzione per i numeri random delle immagini e i likes
 function getRndInteger(min, max) {
