@@ -57,30 +57,42 @@ const post = [
 
 let containerPosts = document.getElementById('container');
 
+//inserisco i post nel DOM
 for (let index = 0; index < post.length; index++) {
 
+    //richiamo la funzione
     containerPosts.innerHTML += makePost(post[index]);
 
 }
 
+//seleziono tutti i footer dei post
 let postFooter = document.querySelectorAll('.post__footer');
 
+//per ogni footer
 for (let x = 0; x < postFooter.length; x++) {
     const like = postFooter[x];
+
+    //seleziono il bottone like
     const likeButton = like.querySelector('.like-button');
+
+    //seleziono il contatore like
     const containerLike = like.querySelector('#like-counter-1');
     let numberLike = containerLike.innerText;
 
     let liked = false;
-    likeButton.addEventListener('click', function () {
-        if (liked == false){
+
+    //al click del bottone like
+    likeButton.addEventListener('click', function (event) {
+        if (liked == false){ //se non c'è già il like
             this.classList.add('like-button--liked');
-            numberLike++;
+            numberLike++; //incremento i like
             liked = true;
-        } else {
+            event.preventDefault();
+        } else { //altrimenti
             this.classList.remove('like-button--liked');
-            numberLike--;
+            numberLike--; //decremento i like
             liked = false;
+            event.preventDefault();
         }
         containerLike.innerText = numberLike;
     });
